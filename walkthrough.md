@@ -17,7 +17,7 @@ graph TD
     Input --> Lexicon[Word-to-Language Lexicon word_languages.json]
     Lexicon --> CSL_Prep[Word-Level Language IDs]
     CSL_Prep --> CSL_Head[Code-Switch Locator Head]
-    CSL_Head --> CSL_Loss[CSL Aux Tagger Loss (α = 1.0)]
+    CSL_Head --> CSL_Loss["CSL Aux Tagger Loss (α = 1.0)"]
     
     CSL_Prep --> SPE_Comp[Switch-Proximity Encoding Computation]
     SPE_Comp --> SPE_Features["SPE Vector: [Proximity, Density, Direction_HiEn, Direction_EnHi]"]
