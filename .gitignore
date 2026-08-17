@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.cache/
+
+# OS
+.DS_Store
+
+# Data & Predictions
+dataset.csv
+baseline_predictions.csv
+switchva_predictions.csv
+*.log
