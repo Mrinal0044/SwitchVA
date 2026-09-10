@@ -1,0 +1,11 @@
+{
+  "seed": 42,
+  "train_sentences": 420,
+  "val_sentences": 89,
+  "test_sentences": 91,
+  "total_sentences": 600,
+  "train_pairs": 762,
+  "val_pairs": 173,
+  "test_pairs": 166,
+  "total_pairs": 1101
+}

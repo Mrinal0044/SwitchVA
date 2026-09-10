@@ -1,0 +1,7 @@
+Mode,Model,Valence_Pearson_r,Valence_MAE,Valence_CCC,Arousal_Pearson_r,Arousal_MAE,Arousal_CCC,Mean_Pearson,Aspect_F1,Opinion_F1
+End-to-End,Switch-Unaware Baseline,0.0729,0.2141,0.0588,0.1192,0.1241,0.0939,0.0961,0.0042,0.0042
+End-to-End,NSSG-DimNet (Ours),0.0931,0.2489,0.0879,0.0532,0.1479,0.0480,0.0732,0.0085,0.0064
+End-to-End,Delta (NSSG - Baseline),+0.0202,+0.0348,+0.0291,-0.0659,+0.0238,-0.0458,-0.0229,+0.0042,+0.0021
+Oracle,Switch-Unaware Baseline,-0.0264,0.2105,-0.0229,-0.0523,0.1381,-0.0450,-0.0393,N/A,N/A
+Oracle,NSSG-DimNet (Ours),0.0583,0.2340,0.0568,0.0351,0.1427,0.0332,0.0467,N/A,N/A
+Oracle,Delta (NSSG - Baseline),+0.0847,+0.0236,+0.0797,+0.0874,+0.0046,+0.0782,+0.0860,N/A,N/A

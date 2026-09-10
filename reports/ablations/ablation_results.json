@@ -1,0 +1,104 @@
+{
+  "wo_switch_embedding": {
+    "study": "wo_switch_embedding",
+    "description": "Removes language ID and signed switch-distance embeddings; feeds pure backbone output to attention.",
+    "test_metrics": {
+      "ccc_v": -0.0024263213317777905,
+      "ccc_a": -0.01897563404441346,
+      "ccc_mean": -0.010700977688095626,
+      "pearson_v": -0.015007134179985181,
+      "pearson_a": -0.10304439304660581,
+      "pearson_mean": -0.0590257636132955,
+      "rmse_v": 0.23833687584193466,
+      "rmse_a": 0.16525452703644697,
+      "mae_v": 0.20324859445451932,
+      "mae_a": 0.13539229751012888,
+      "loss": 2.169049382209778
+    }
+  },
+  "wo_sp_gsa": {
+    "study": "wo_sp_gsa",
+    "description": "Replaces SP-GSA with standard transformer self-attention without switch-point gating.",
+    "test_metrics": {
+      "ccc_v": -0.0024263213317777905,
+      "ccc_a": -0.01897563404441346,
+      "ccc_mean": -0.010700977688095626,
+      "pearson_v": -0.015007134179985181,
+      "pearson_a": -0.10304439304660581,
+      "pearson_mean": -0.0590257636132955,
+      "rmse_v": 0.23833687584193466,
+      "rmse_a": 0.16525452703644697,
+      "mae_v": 0.20324859445451932,
+      "mae_a": 0.13539229751012888,
+      "loss": 2.169049382209778
+    }
+  },
+  "wo_hnsg_rgat": {
+    "study": "wo_hnsg_rgat",
+    "description": "Removes Branch 2 (H-NSG + RGAT); regresses directly from Branch 1 span representation.",
+    "test_metrics": {
+      "ccc_v": -0.0005445719379237941,
+      "ccc_a": 0.0198568793876208,
+      "ccc_mean": 0.009656153724848503,
+      "pearson_v": -0.0068262647993563895,
+      "pearson_a": 0.14336646992011642,
+      "pearson_mean": 0.06827010256038002,
+      "rmse_v": 0.23994750718114685,
+      "rmse_a": 0.14521532074150867,
+      "mae_v": 0.2056376253058956,
+      "mae_a": 0.11972429199962858,
+      "loss": 2.1251803398132325
+    }
+  },
+  "wo_nrc_vad": {
+    "study": "wo_nrc_vad",
+    "description": "Excludes symbolic NRC-VAD affective prior nodes and edges from H-NSG graph.",
+    "test_metrics": {
+      "ccc_v": -0.0024263213317777905,
+      "ccc_a": -0.01897563404441346,
+      "ccc_mean": -0.010700977688095626,
+      "pearson_v": -0.015007134179985181,
+      "pearson_a": -0.10304439304660581,
+      "pearson_mean": -0.0590257636132955,
+      "rmse_v": 0.23833687584193466,
+      "rmse_a": 0.16525452703644697,
+      "mae_v": 0.20324859445451932,
+      "mae_a": 0.13539229751012888,
+      "loss": 2.169049382209778
+    }
+  },
+  "wo_cross_attention": {
+    "study": "wo_cross_attention",
+    "description": "Replaces mutual cross-attention with simple naive concatenation of span and graph vectors.",
+    "test_metrics": {
+      "ccc_v": -0.0024263213317777905,
+      "ccc_a": -0.01897563404441346,
+      "ccc_mean": -0.010700977688095626,
+      "pearson_v": -0.015007134179985181,
+      "pearson_a": -0.10304439304660581,
+      "pearson_mean": -0.0590257636132955,
+      "rmse_v": 0.23833687584193466,
+      "rmse_a": 0.16525452703644697,
+      "mae_v": 0.20324859445451932,
+      "mae_a": 0.13539229751012888,
+      "loss": 2.169049382209778
+    }
+  },
+  "wo_ccc_loss": {
+    "study": "wo_ccc_loss",
+    "description": "Ablates the CCC loss component, training solely on Smooth L1 regression loss.",
+    "test_metrics": {
+      "ccc_v": -0.0010317947808069082,
+      "ccc_a": -0.04863003063906566,
+      "ccc_mean": -0.024830912709936283,
+      "pearson_v": -0.006690445928544851,
+      "pearson_a": -0.1800104556337682,
+      "pearson_mean": -0.09335045078115652,
+      "rmse_v": 0.23280658543930294,
+      "rmse_a": 0.14798822646172835,
+      "mae_v": 0.18936721254496058,
+      "mae_a": 0.12250645306839306,
+      "loss": 0.2652703493833542
+    }
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "audit_version": "1.0",
+  "project": "NSSG-DimNet",
+  "timestamp": "2026-09-11T00:11:45+05:30",
+  "decision": "STATUS C",
+  "decision_statement": "An evaluation implementation issue was found and corrected.",
+  "executive_summary": "The previously reported 1.0000 Aspect and Opinion F1 was caused by an evaluation implementation issue in scripts/evaluate.py where empty predicted span lists fell back to gold spans (if not p_asp: p_asp = g_asp), inadvertently evaluating gold spans against themselves. Furthermore, the regression stage was previously supplied with gold span coordinates, which constitutes Gold-Span Oracle evaluation rather than End-to-End inference. This has been corrected by implementing two explicitly separated evaluation modes: Mode A (End-to-End Predicted Spans) and Mode B (Gold-Span Oracle).",
+  "audit_1_trace_aspect_opinion_f1": {
+    "question_1_are_spans_predicted_by_model": false,
+    "question_2_are_gold_spans_used": true,
+    "question_3_are_gold_spans_supplied_to_regression": true,
+    "question_4_is_evaluator_using_teacher_forcing": true,
+    "question_5_does_evaluation_decode_biaffine_score_matrices": "Initially decoded internally in BiaffineSpanExtractor but omitted from top-level model output dict, causing fallback in evaluate.py.",
+    "question_6_is_predicted_span_output_compared_against_gold": "Previously no (gold compared against gold due to fallback). In revised pipeline, yes (predicted candidate spans compared against gold spans using exact token matching)."
+  },
+  "audit_2_no_gold_span_leakage": {
+    "verified": true,
+    "test_file": "tests/test_evaluation_audit.py",
+    "test_name": "test_audit_2_no_gold_span_leakage_in_end_to_end_mode",
+    "mechanism": "In Mode A, aspect_spans and opinion_spans are set to None. Downstream representations are pooled strictly from the top decoded predicted spans."
+  },
+  "audit_3_no_gold_va_leakage": {
+    "verified": true,
+    "test_file": "tests/test_evaluation_audit.py",
+    "test_name": "test_audit_3_no_gold_va_leakage",
+    "mechanism": "Gold valence and arousal targets are never accepted or processed by model forward passes or H-NSG/RGAT modules. Mutating targets has zero impact on predictions."
+  },
+  "audit_4_baseline_fairness": {
+    "verified": true,
+    "shared_conditions": [
+      "Exact same tokenized input sentences",
+      "Exact same train/val/test splits",
+      "Exact same batch size and collation",
+      "Exact same JointVALoss formulation during training",
+      "Identical span decoding policy during inference"
+    ],
+    "architectural_differences": [
+      "Baseline omits signed switch distance",
+      "Baseline omits switch embeddings",
+      "Baseline omits SP-GSA switch gating",
+      "Baseline omits H-NSG heterogeneous graph",
+      "Baseline omits NRC-VAD affective priors",
+      "Baseline omits Relational Graph Attention (RGAT)",
+      "Baseline omits Aspect-Guided Mutual Cross-Attention"
+    ]
+  },
+  "audit_5_mode_separation": {
+    "mode_a_name": "Mode A: End-to-End Predicted Spans",
+    "mode_a_description": "Model predicts aspect and opinion spans without gold coordinate inputs; top predicted spans condition downstream regression.",
+    "mode_b_name": "Mode B: Gold-Span Oracle",
+    "mode_b_description": "Gold span boundaries supplied directly to regression heads to benchmark dimensional sentiment regression in isolation."
+  },
+  "audit_6_span_metrics_mode_a": {
+    "aspect": {
+      "baseline": {
+        "precision": 0.0025,
+        "recall": 0.0127,
+        "f1": 0.0042,
+        "correct": 2,
+        "total_predicted": 785,
+        "total_gold": 157
+      },
+      "nssg_dimnet": {
+        "precision": 0.0051,
+        "recall": 0.0255,
+        "f1": 0.0085,
+        "correct": 4,
+        "total_predicted": 785,
+        "total_gold": 157
+      }
+    },
+    "opinion": {
+      "baseline": {
+        "precision": 0.0025,
+        "recall": 0.0127,
+        "f1": 0.0042,
+        "correct": 2,
+        "total_predicted": 785,
+        "total_gold": 157
+      },
+      "nssg_dimnet": {
+        "precision": 0.0038,
+        "recall": 0.0191,
+        "f1": 0.0064,
+        "correct": 3,
+        "total_predicted": 785,
+        "total_gold": 157
+      }
+    }
+  },
+  "audit_7_va_metrics": {
+    "mode_a_end_to_end": {
+      "baseline": {
+        "pearson_v": 0.0729,
+        "mae_v": 0.2141,
+        "ccc_v": 0.0588,
+        "pearson_a": 0.1192,
+        "mae_a": 0.1241,
+        "ccc_a": 0.0939,
+        "pearson_mean": 0.0961
+      },
+      "nssg_dimnet": {
+        "pearson_v": 0.0931,
+        "mae_v": 0.2489,
+        "ccc_v": 0.0879,
+        "pearson_a": 0.0532,
+        "mae_a": 0.1479,
+        "ccc_a": 0.0480,
+        "pearson_mean": 0.0732
+      },
+      "delta_nssg_minus_baseline": {
+        "delta_pearson_v": 0.0202,
+        "delta_mae_v": 0.0348,
+        "delta_ccc_v": 0.0291,
+        "delta_pearson_a": -0.0659,
+        "delta_mae_a": 0.0238,
+        "delta_ccc_a": -0.0458,
+        "delta_pearson_mean": -0.0229
+      }
+    },
+    "mode_b_oracle": {
+      "baseline": {
+        "pearson_v": -0.0264,
+        "mae_v": 0.2105,
+        "ccc_v": -0.0229,
+        "pearson_a": -0.0523,
+        "mae_a": 0.1381,
+        "ccc_a": -0.0450,
+        "pearson_mean": -0.0393
+      },
+      "nssg_dimnet": {
+        "pearson_v": 0.0583,
+        "mae_v": 0.2340,
+        "ccc_v": 0.0568,
+        "pearson_a": 0.0351,
+        "mae_a": 0.1427,
+        "ccc_a": 0.0332,
+        "pearson_mean": 0.0467
+      },
+      "delta_nssg_minus_baseline": {
+        "delta_pearson_v": 0.0847,
+        "delta_mae_v": 0.0236,
+        "delta_ccc_v": 0.0797,
+        "delta_pearson_a": 0.0874,
+        "delta_mae_a": 0.0046,
+        "delta_ccc_a": 0.0782,
+        "delta_pearson_mean": 0.0860
+      }
+    }
+  },
+  "audit_8_test_set_integrity": {
+    "train_sentence_count": 420,
+    "val_sentence_count": 89,
+    "test_sentence_count": 91,
+    "train_test_id_overlap": 0,
+    "val_test_id_overlap": 0,
+    "cross_split_text_duplicates": 0,
+    "isolation_status": "PERFECT_ISOLATION"
+  },
+  "audit_9_high_switch_density_observation": {
+    "formula": "switches / max(1, len(lang_ids) - 1)",
+    "computed_identically": true,
+    "high_density_threshold": ">= 0.30",
+    "high_density_sample_count": 64,
+    "empirical_observation": "Under High Switch Density (rho >= 0.30), the Switch-Unaware Baseline exhibited negative correlation (r_V = -0.1973, r_A = -0.1843), whereas NSSG-DimNet exhibited r_V = -0.0020 (Delta = +0.1953) and r_A = +0.1596 (Delta = +0.3439). The mechanism of cross-lingual attention mitigation remains an unproven theoretical hypothesis.",
+    "causal_claim_retracted": true
+  }
+}

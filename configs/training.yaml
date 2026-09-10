@@ -1,0 +1,31 @@
+# Global Training and Hyperparameter Configuration for NSSG-DimNet
+
+training:
+  seed: 42
+  batch_size: 8
+  num_epochs: 25
+  learning_rate: 1.0e-4
+  backbone_learning_rate: 2.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  gradient_accumulation_steps: 1
+  max_grad_norm: 1.0
+  mixed_precision: false
+  early_stopping_patience: 7
+  device: "auto"
+
+checkpoint:
+  checkpoint_dir: "checkpoints"
+  checkpoint_metric: "val_combined_pearson" # (val_pearson_v + val_pearson_a) / 2
+  checkpoint_mode: "max"
+
+loss:
+  lambda_ccc: 1.0
+  lambda_smooth: 0.5
+  lambda_span: 0.3
+  smooth_l1_beta: 0.05
+
+inference:
+  span_threshold: 0.0
+  top_k: 5
+  max_span_length: 12

@@ -1,0 +1,51 @@
+{
+  "num_sentences": 600,
+  "num_aspect_opinion_pairs": 1101,
+  "avg_pairs_per_sentence": 1.835,
+  "min_pairs_per_sentence": 1,
+  "max_pairs_per_sentence": 6,
+  "valence_stats": {
+    "mean": 0.41114623069936423,
+    "std": 0.242078641219829,
+    "min": 0.02,
+    "max": 0.95
+  },
+  "arousal_stats": {
+    "mean": 0.6050544959128065,
+    "std": 0.13663484066053544,
+    "min": 0.2,
+    "max": 0.95
+  },
+  "token_stats": {
+    "total_tokens": 18176,
+    "hi_tokens": 13213,
+    "hi_proportion": 0.7269476232394366,
+    "en_tokens": 4963,
+    "en_proportion": 0.2730523767605634,
+    "other_tokens": 0,
+    "other_proportion": 0.0
+  },
+  "code_switch_stats": {
+    "sentences_with_switch": 600,
+    "sentences_without_switch": 0,
+    "mean_switches_per_sentence": 8.726666666666667,
+    "max_switches_per_sentence": 31
+  },
+  "span_alignment_stats": {
+    "exact_count": 2125,
+    "exact_pct": 96.50317892824705,
+    "normalized_count": 5,
+    "normalized_pct": 0.2270663033605813,
+    "approximate_count": 43,
+    "approximate_pct": 1.952770208900999,
+    "unmatched_count": 29,
+    "unmatched_pct": 1.3169845594913716,
+    "total_spans": 2202
+  },
+  "integrity_checks": {
+    "token_count_mismatches": 0,
+    "validation_errors": 0,
+    "duplicate_sentence_ids": 0,
+    "duplicate_sentences": 2
+  }
+}

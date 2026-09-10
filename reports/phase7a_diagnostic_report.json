@@ -1,0 +1,172 @@
+{
+  "audit_phase": "Phase 7A",
+  "project": "NSSG-DimNet",
+  "timestamp": "2026-09-11T00:46:00+05:30",
+  "audit_summary": {
+    "primary_root_cause": "The Biaffine Span Extractor received ZERO training gradients throughout Phase 6 training. The auxiliary span loss was never computed (train_loss_span = 0.0000 across all epochs) due to missing span_targets collation and disconnected gradient flow, leaving the span extractor weights completely random and untrained.",
+    "diagnosed_aspect_f1": 0.0085,
+    "diagnosed_opinion_f1": 0.0064,
+    "diagnosed_mode_a_valence_r": 0.0931,
+    "diagnosed_mode_a_arousal_r": 0.0532,
+    "diagnosed_mode_b_valence_r": 0.0583,
+    "diagnosed_mode_b_arousal_r": 0.0351
+  },
+  "audit_1_gold_grid_verification": {
+    "status": "NO ISSUE FOUND",
+    "samples_inspected": 10,
+    "verified_all_start_le_end": true,
+    "verified_all_positive_cells_match": true,
+    "alignment_accuracy": "100.0%"
+  },
+  "audit_2_class_imbalance": {
+    "status": "LIKELY HYPERPARAMETER ISSUE",
+    "total_valid_cells": 160756,
+    "aspect_cells": {
+      "positive_count": 733,
+      "negative_count": 160023,
+      "positive_ratio": 0.00455971,
+      "negative_ratio": 0.99544029,
+      "imbalance_ratio": "218.3 : 1"
+    },
+    "opinion_cells": {
+      "positive_count": 680,
+      "negative_count": 160076,
+      "positive_ratio": 0.00423001,
+      "negative_ratio": 0.99576999,
+      "imbalance_ratio": "235.4 : 1"
+    },
+    "finding": "Extreme class sparsity where over 99.5% of valid candidate span cells are negative."
+  },
+  "audit_3_span_loss_behavior": {
+    "status": "CONFIRMED BUG",
+    "train_loss_span_per_epoch": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "test_set_raw_scores": {
+      "aspect": {
+        "mean_logit_pos": 0.3607,
+        "mean_logit_neg": 0.3846,
+        "mean_prob_pos": 0.5568,
+        "mean_prob_neg": 0.5578,
+        "logit_difference": -0.0239
+      },
+      "opinion": {
+        "mean_logit_pos": 0.0918,
+        "mean_logit_neg": 0.4591,
+        "mean_prob_pos": 0.5114,
+        "mean_prob_neg": 0.5701,
+        "logit_difference": -0.3673
+      }
+    },
+    "finding": "Span loss was 0.0 at all epochs. Predicted probabilities on positive and negative cells are virtually indistinguishable (~0.55 vs ~0.55), confirming randomly initialized weights."
+  },
+  "audit_4_decoder_analysis": {
+    "status": "CONFIRMED BUG & HYPERPARAMETER ISSUE",
+    "max_scores_test_sample_range": [4.398, 7.996],
+    "spans_above_zero_per_sample": [68, 495],
+    "threshold_sensitivity": {
+      "0.01": {"aspect_f1": 0.0040, "opinion_f1": 0.0060},
+      "0.05": {"aspect_f1": 0.0040, "opinion_f1": 0.0060},
+      "0.10": {"aspect_f1": 0.0040, "opinion_f1": 0.0060},
+      "0.20": {"aspect_f1": 0.0040, "opinion_f1": 0.0060},
+      "0.30": {"aspect_f1": 0.0040, "opinion_f1": 0.0060},
+      "0.50": {"aspect_f1": 0.0040, "opinion_f1": 0.0060},
+      "1.00": {"aspect_f1": 0.0040, "opinion_f1": 0.0060},
+      "2.00": {"aspect_f1": 0.0040, "opinion_f1": 0.0040}
+    },
+    "finding": "Because weights are untrained and scores are arbitrary, threshold variations yield flat F1 scores (< 0.0085)."
+  },
+  "audit_5_tiny_data_overfit": {
+    "status": "CONFIRMED BUG",
+    "current_pipeline_overfit_10_examples": {
+      "total_loss_start": 6.2430,
+      "total_loss_end": 0.3328,
+      "span_loss": 0.0000,
+      "aspect_f1": 0.0000,
+      "opinion_f1": 0.0000,
+      "finding": "Current pipeline completely fails to memorize spans on 10 examples because span loss is 0.0 and span modules receive zero gradients."
+    },
+    "supervised_biaffinespanloss_diagnostic": {
+      "span_loss_start": 10.4371,
+      "span_loss_end": 0.7767,
+      "finding": "When supervised with BiaffineSpanLoss, span loss drops smoothly from 10.43 to 0.77, proving the architecture is fully capable of learning when supervised."
+    }
+  },
+  "audit_6_loss_contribution": {
+    "status": "CONFIRMED BUG",
+    "mean_total_loss": 2.082472,
+    "weighted_ccc_contribution": 1.913834,
+    "weighted_ccc_percent": 0.9190,
+    "weighted_smooth_contribution": 0.168638,
+    "weighted_smooth_percent": 0.0810,
+    "weighted_span_contribution": 0.000000,
+    "weighted_span_percent": 0.0000,
+    "finding": "Span loss contribution was exactly 0.000000% of the training objective."
+  },
+  "audit_7_mode_a_vs_mode_b": {
+    "status": "NO ISSUE FOUND",
+    "documentation_file": "reports/mode_a_mode_b_flow.md",
+    "verified_isolation": true
+  },
+  "audit_8_target_leakage": {
+    "status": "NO ISSUE FOUND",
+    "verified_target_perturbation": true,
+    "delta_prediction": 0.000000,
+    "test_file": "tests/test_evaluation_audit.py"
+  },
+  "audit_9_baseline_consistency": {
+    "status": "NO ISSUE FOUND",
+    "shared_pipeline_verified": true,
+    "intended_architectural_differences_documented": true
+  },
+  "audit_10_gradient_check": {
+    "status": "CONFIRMED BUG",
+    "gradient_norms_after_1_step": {
+      "backbone": 3.758688,
+      "switch_embedding": 0.158410,
+      "sp_gsa": 0.377044,
+      "biaffine_aspect_start_mlp": 0.000000,
+      "biaffine_aspect_end_mlp": 0.000000,
+      "biaffine_aspect_scorer": 0.000000,
+      "biaffine_opinion_start_mlp": 0.000000,
+      "biaffine_opinion_end_mlp": 0.000000,
+      "biaffine_opinion_scorer": 0.000000,
+      "biaffine_span_repr_proj": 3.128446,
+      "hnsg_builder": 0.000000,
+      "rgat": 0.145240,
+      "cross_attention": 0.219608,
+      "fusion": 2.285999,
+      "valence_head": 3.256818,
+      "arousal_head": 2.819232
+    },
+    "dead_modules": [
+      "biaffine_aspect_start_mlp",
+      "biaffine_aspect_end_mlp",
+      "biaffine_aspect_scorer",
+      "biaffine_opinion_start_mlp",
+      "biaffine_opinion_end_mlp",
+      "biaffine_opinion_scorer"
+    ],
+    "cause": "Teacher forcing during training bypassed scorer outputs directly into span_repr_proj, and JointVALoss omitted span supervision."
+  },
+  "audit_11_predictions_origin": {
+    "status": "NO ISSUE FOUND",
+    "samples_reported": 20,
+    "verified_explicit_origin": true
+  },
+  "audit_12_findings_and_classification": {
+    "classification": {
+      "missing_span_loss_in_training": "CONFIRMED BUG",
+      "dead_biaffine_gradient_path": "CONFIRMED BUG",
+      "joint_loss_interface_mismatch": "CONFIRMED BUG",
+      "class_imbalance_and_static_threshold": "LIKELY HYPERPARAMETER ISSUE",
+      "gold_span_grid_construction": "NO ISSUE FOUND",
+      "target_va_leakage": "NO ISSUE FOUND",
+      "baseline_consistency": "NO ISSUE FOUND",
+      "mode_a_mode_b_separation": "NO ISSUE FOUND"
+    },
+    "recommended_corrections": [
+      "1. Update dimabsa_tensor_collate_fn to construct and collate valid 2D span candidate masks and gold span indices for batch supervision.",
+      "2. Integrate BiaffineSpanLoss (BCE with pos_weight ~50.0-100.0) into JointVALoss and the training loop so that biaffine MLPs receive supervision gradients.",
+      "3. In decode_spans, support adaptive or top-k ranked decoding without an arbitrary >= 0.0 logit cutoff."
+    ]
+  }
+}

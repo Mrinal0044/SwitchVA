@@ -1,0 +1,60 @@
+# Corrected NSSG-DimNet Training Configuration (Phase 7B)
+# Post-Diagnostic Audit Correction for Hinglish DimABSA
+
+experiment:
+  name: "nssg_dimnet_corrected"
+  seed: 42
+  output_dir: "checkpoints/nssg_dimnet"
+  best_checkpoint_name: "best_model_corrected.pt"
+  last_checkpoint_name: "last_model_corrected.pt"
+  history_filename: "corrected_training_history.json"
+  log_dir: "reports/logs"
+
+data:
+  train_path: "data/splits/train.jsonl"
+  val_path: "data/splits/validation.jsonl"
+  test_path: "data/splits/test.jsonl"
+  max_seq_length: 128
+  batch_size: 16
+  num_workers: 0
+
+model:
+  name: "NSSGDimNet"
+  hidden_dim: 128
+  num_languages: 4
+  max_signed_distance: 64
+  num_spgsa_heads: 4
+  span_mlp_dim: 64
+  nrc_vad_dim: 3
+  num_relations: 6
+  rgat_layers: 2
+  rgat_heads: 4
+  cross_attn_heads: 4
+  regression_hidden_dim: 128
+  use_mock_backbone: true
+
+training:
+  num_epochs: 25
+  learning_rate: 1.0e-4
+  backbone_learning_rate: 2.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  gradient_accumulation_steps: 1
+  max_grad_norm: 1.0
+  early_stopping_patience: 7
+  device: "cpu"
+
+loss:
+  lambda_ccc: 1.0
+  lambda_smooth: 0.5
+  lambda_span: 0.5
+  aspect_pos_weight: 50.0
+  opinion_pos_weight: 50.0
+  smooth_l1_beta: 0.05
+
+decoding:
+  strategy: "ranked"
+  top_k_aspect: 5
+  top_k_opinion: 5
+  score_floor: null
+  threshold_baseline: 0.0

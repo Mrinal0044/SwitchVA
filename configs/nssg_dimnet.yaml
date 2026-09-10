@@ -1,0 +1,92 @@
+# NSSG-DimNet Official Configuration
+# Neuro-Symbolic Switch-Gated Dual-Graph Network for Hinglish DimABSA
+
+experiment:
+  name: "nssg_dimnet_full"
+  seed: 42
+  output_dir: "checkpoints/nssg_dimnet"
+  log_dir: "reports/logs"
+
+data:
+  dataset_path: "DimABSA_Final_Dataset_600.csv"
+  max_seq_length: 128
+  batch_size: 16
+  num_workers: 0
+
+model:
+  name: "NSSGDimNet"
+  
+  # Multilingual Transformer Backbone
+  backbone:
+    pretrained_model_name: "l3cube-pune/hing-roberta"
+    alternative_backbone: "microsoft/mdeberta-v3-base"
+    hidden_dim: 768
+    freeze_backbone: false
+    pooling: "none"  # token-level representations
+
+  # Switch Embedding & Signed Switch-Distance
+  switch_embedding:
+    num_languages: 4        # HI, EN, MIXED/OTHER, PAD
+    lang_embed_dim: 64
+    max_signed_distance: 64 # [-64, 64]
+    dist_embed_dim: 64
+    output_dim: 768         # matches backbone hidden_dim
+    dropout: 0.1
+
+  # Switch-Point Gated Self-Attention (SP-GSA)
+  sp_gsa:
+    hidden_dim: 768
+    num_heads: 8
+    dropout: 0.1
+    gate_activation: "sigmoid"
+
+  # Branch 1: Biaffine Aspect-Opinion Span Extractor
+  biaffine_span:
+    input_dim: 768
+    mlp_dim: 256
+    num_labels: 3           # NONE, ASPECT, OPINION
+    dropout: 0.2
+
+  # Branch 2: Heterogeneous Neuro-Symbolic Graph (H-NSG) & RGAT
+  hnsg:
+    node_feature_dim: 768
+    nrc_vad_dim: 3          # Valence, Arousal, Dominance affective priors
+    num_relations: 6        # SYNTACTIC_DEP, ADJACENT, CROSS_LINGUAL, AFFECTIVE_PRIOR, SPAN_CONTAIN, SELF
+    rgat:
+      hidden_dim: 768
+      num_layers: 2
+      num_heads: 4
+      dropout: 0.2
+      use_residual: true
+
+  # Aspect-Guided Mutual Cross-Attention
+  cross_attention:
+    hidden_dim: 768
+    num_heads: 8
+    dropout: 0.1
+    fused_dim: 2304         # 3 * hidden_dim (768 * 3 = 2304)
+
+  # Dimensional Regression Heads
+  regression_heads:
+    input_dim: 2304         # Fused representation Z in R^(3d)
+    hidden_dim: 512
+    dropout: 0.1
+    activation: "gelu"
+    output_activation: "sigmoid" # Constrains predictions to [0, 1]
+
+training:
+  num_epochs: 30
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  gradient_accumulation_steps: 1
+  max_grad_norm: 1.0
+  device: "auto"            # "cuda", "mps", "cpu", or "auto"
+
+loss:
+  ccc_weight_v: 1.0
+  ccc_weight_a: 1.0
+  smooth_l1_weight_v: 0.5
+  smooth_l1_weight_a: 0.5
+  span_loss_weight: 0.3
+  smooth_l1_beta: 0.05

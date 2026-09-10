@@ -12,3 +12,5 @@ dataset.csv
 baseline_predictions.csv
 switchva_predictions.csv
 *.log
+checkpoints/
+*.pt

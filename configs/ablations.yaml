@@ -1,0 +1,64 @@
+# NSSG-DimNet Ablation Study Configurations
+
+ablation_studies:
+  # 1. Without Signed Switch-Distance & Switch Embedding
+  wo_switch_embedding:
+    description: "Removes language ID and signed switch-distance embeddings; feeds pure backbone output to attention."
+    model:
+      use_switch_embedding: false
+      use_sp_gsa: true
+      use_biaffine_span: true
+      use_hnsg_rgat: true
+      use_cross_attention: true
+
+  # 2. Without Switch-Point Gated Self-Attention (Standard Self-Attention only)
+  wo_sp_gsa:
+    description: "Replaces SP-GSA with standard transformer self-attention without switch-point gating."
+    model:
+      use_switch_embedding: true
+      use_sp_gsa: false
+      use_biaffine_span: true
+      use_hnsg_rgat: true
+      use_cross_attention: true
+
+  # 3. Without Heterogeneous Neuro-Symbolic Graph / RGAT (Branch 2 removed)
+  wo_hnsg_rgat:
+    description: "Removes Branch 2 (H-NSG + RGAT); regresses directly from Branch 1 span representation."
+    model:
+      use_switch_embedding: true
+      use_sp_gsa: true
+      use_biaffine_span: true
+      use_hnsg_rgat: false
+      use_cross_attention: false
+      fused_dim: 768
+
+  # 4. Without NRC-VAD Affective Priors in H-NSG
+  wo_nrc_vad:
+    description: "Excludes symbolic NRC-VAD affective prior nodes and edges from H-NSG graph."
+    model:
+      use_switch_embedding: true
+      use_sp_gsa: true
+      use_biaffine_span: true
+      use_hnsg_rgat: true
+      use_nrc_vad: false
+      use_cross_attention: true
+
+  # 5. Without Mutual Cross-Attention (Simple Concatenation)
+  wo_cross_attention:
+    description: "Replaces mutual cross-attention with simple naive concatenation of span and graph vectors."
+    model:
+      use_switch_embedding: true
+      use_sp_gsa: true
+      use_biaffine_span: true
+      use_hnsg_rgat: true
+      use_cross_attention: false
+      fused_dim: 1536 # 2 * 768
+
+  # 6. Without CCC Loss (Trained with Smooth L1 / MSE only)
+  wo_ccc_loss:
+    description: "Ablates the CCC loss component, training solely on Smooth L1 regression loss."
+    loss:
+      ccc_weight_v: 0.0
+      ccc_weight_a: 0.0
+      smooth_l1_weight_v: 1.0
+      smooth_l1_weight_a: 1.0

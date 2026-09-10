@@ -1,0 +1,52 @@
+# Baseline Configuration for Comparative Evaluation (Switch-Unaware)
+
+experiment:
+  name: "switch_unaware_baseline"
+  seed: 42
+  output_dir: "checkpoints/baseline"
+  log_dir: "reports/logs"
+
+data:
+  train_path: "data/splits/train.jsonl"
+  val_path: "data/splits/validation.jsonl"
+  test_path: "data/splits/test.jsonl"
+  max_seq_length: 128
+  batch_size: 8
+  num_workers: 0
+
+model:
+  name: "SwitchUnawareBaseline"
+  backbone:
+    pretrained_model_name: "l3cube-pune/hing-roberta"
+    alternative_backbone: "microsoft/mdeberta-v3-base"
+    hidden_dim: 768
+    freeze_backbone: false
+  
+  biaffine_span:
+    input_dim: 768
+    mlp_dim: 256
+    num_labels: 3
+    dropout: 0.1
+    
+  regression_heads:
+    input_dim: 1536 # 2 * 768 (pooled aspect + pooled opinion)
+    hidden_dim: 512
+    dropout: 0.1
+    activation: "gelu"
+    output_activation: "sigmoid"
+
+training:
+  num_epochs: 25
+  learning_rate: 1.0e-4
+  backbone_learning_rate: 2.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  max_grad_norm: 1.0
+  early_stopping_patience: 7
+  device: "auto"
+
+loss:
+  lambda_ccc: 1.0
+  lambda_smooth: 0.5
+  lambda_span: 0.3
+  smooth_l1_beta: 0.05
